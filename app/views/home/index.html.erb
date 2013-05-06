@@ -1,2 +1,9 @@
 <h1>Hue Controller</h1>
-Hello World
+<br><br>
+Light:
+<%= form_tag '/' do %>
+<%= number_field_tag :light %>
+<br><br>
+<%= submit_tag "Save" %>
+<% end %>
+<% @a.status params[:light] %>
