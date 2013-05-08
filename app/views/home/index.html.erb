@@ -1,9 +1,31 @@
-<h1>Hue Controller</h1>
-<br><br>
-Light:
+<div class = 'page-header'>
+<h1>Light Controller</h1>
+</div>
+<br>
 <%= form_tag '/' do %>
-<%= number_field_tag :light %>
+<div class = 'well well-large'>
+Light:
+<%= select_tag :bulb, options_for_select(@a.array[1, @a.array.length]), :class => 'btn dropdown-toggle' %>
 <br><br>
-<%= submit_tag "Save" %>
+On/Off:
+<%= select_tag :state, options_for_select([["On", 1], ["Off", 0]]), :class => 'btn dropdown-toggle' %>
+<br><br>
+Brightness:
+<%= select_tag :brightness, options_for_select([["Dim", 50], ["Normal", 125], ["Bright", 200], ["Max", 255]]), :class => 'btn dropdown-toggle' %>
+<br><br>
+Color:
+<%= select_tag :color, options_for_select([
+	["White", 33333], ["Blue", 46920], ["Green", 25500], ["Red", 65535], ["Yellow", 15331], ["Purple", 52252], ["Orange", 5963]
+	]), :class => 'btn dropdown-toggle' %>
+</div>
+<br>
+<%= submit_tag "Save", :class => 'btn btn-primary' %>
 <% end %>
-<% @a.status params[:light] %>
+
+<br>
+<% if params[:light].nil? %>
+<% @a.state(@a.array.index(params[:bulb]), params[:state], params[:brightness].to_i,
+	params[:color].to_i, 0, 0, 0, 0) %>
+<br>
+<% end %>
+<br>

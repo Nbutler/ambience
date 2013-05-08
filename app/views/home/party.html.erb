@@ -1,0 +1,18 @@
+<div class = 'page-header'>
+<h1>Party Light</h1>
+</div>
+<br><br>
+<%= form_tag '/party' do %>
+Light:
+<%= select_tag :bulb, options_for_select(@a.array[1, @a.array.length]), :class => 'btn dropdown-toggle' %>
+<br><br>
+Effect:
+<%= select_tag :effect, options_for_select(@effects), :class => 'btn dropdown-toggle' %>
+<br><br>
+<%= submit_tag "Save", :class => 'btn btn-primary' %>
+<% end %>
+<br>
+<% if params[:light].nil? %>
+<% @a.state(@a.array.index(params[:bulb]), 1, 0, 0, 0, 0, params[:effect], 0) %>
+<br>
+<% end %>

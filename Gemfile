@@ -1,11 +1,11 @@
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.8'
+gem 'rails', '3.2.13'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-#gem 'sqlite3'
+gem 'pg'
 
 
 # Gems used only for assets and not required
@@ -18,6 +18,9 @@ group :assets do
   # gem 'therubyracer', :platforms => :ruby
 
   gem 'uglifier', '>= 1.0.3'
+  gem 'twitter-bootstrap-rails'
+  gem 'bootstrap-colorpicker-rails'
+  gem 'jquery-minicolors-rails'
 end
 
 gem 'jquery-rails'
@@ -29,7 +32,7 @@ gem 'jquery-rails'
 # gem 'jbuilder'
 
 # Use unicorn as the app server
-# gem 'unicorn'
+gem 'unicorn'
 
 # Deploy with Capistrano
 # gem 'capistrano'
@@ -38,3 +41,5 @@ gem 'jquery-rails'
 # gem 'debugger'
 
 gem 'rest-client'
+gem "therubyracer"
+gem "less-rails"

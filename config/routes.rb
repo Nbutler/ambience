@@ -1,6 +1,9 @@
-Hue::Application.routes.draw do
-  root :to => "home#index"
-
+Ambience::Application.routes.draw do
+	root :to => "home#index"
+	match '/party', to: "home#party"
+	match '/login', to: "home#login"
+	match '/schedule', to: "home#schedule"
+	
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

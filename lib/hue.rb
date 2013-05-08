@@ -1,12 +1,19 @@
-require 'rubygems'
-require 'json'
-require 'rest-client'
-require 'uri'
-
 module Hue
 	class Hue
-	attr_accessor :url, :ip, :user, :id	
+	attr_accessor :url, :ip, :user, :id, :array
+	
 	def initialize
+		@user = "benthemathwhiz"
+		#only one element array so the index is 0
+		@ip = "192.168.1.133"
+		#bridge id
+		#@id = ipcheck[0]["id"]
+		#creates a common url for most functions
+		@url = "#{ip}/api/#{user}"
+	end
+	
+	#this is the one that would typically get used at home
+	def local_host_only
 		@user = "benthemathwhiz"
 		#grabs the ip address from the meethue website
 		#requires hub to be connected to the meethue website
@@ -20,46 +27,10 @@ module Hue
 	end
 	
 	def test
-		abc = user
-	end
-	
-	def selection(time)
-		if time == 0
-			puts "1. Turn light on or off"
-			puts "2. Alert"
-			puts "3. Give status of light" 
-			puts "4. Schedules"
-			puts "5. Exit"
-		else
-			puts "1. Turn light on or off"
-			puts "2. Alert"
-		end
-		print "Choice: "
-		choice = gets.chomp.to_i
-
-		case choice
-		when 1
-			puts "Enter light number"
-			light = gets.chomp
-			puts "On or off (1 or 0)"
-			choice = !gets.chomp.to_i.zero?
-			state(light, choice, time)
-		when 2
-			puts "Enter light number"
-			light = gets.chomp
-			puts "Short or long (1 or 0)"
-			type = gets.chomp.to_i
-			alert(light, type, time)
-		when 3
-			puts "Enter light number"
-			light = gets.chomp
-			status(light)
-		when 4
-			puts "1. for schedule status", "2. to create a schedule", "3. to delete one"
-			choice = gets.chomp.to_i
-			schedule(choice)
-		when 5
-			exit
+		lights = JSON.parse(request("GET", "/lights", 0))
+		i = 1
+		while !lights[i.to_s].nil?
+			i += 1
 		end
 	end
 	
@@ -67,35 +38,74 @@ module Hue
 		request("GET", "/lights/#{light}", 0)
 	end
 	
-	def state(light, light_state, time)
-		request("PUT", "/lights/#{light}/state", {"on" => light_state}, time)
-	end
-	
-	def alert(light, type, time)
-		if type == 1
-			alert_type = "select"
-		elsif type == 0
-			alert_type = "lselect"
-		else
-			puts "Invalid choice"
+	def all_lights
+		lights = JSON.parse(request("GET", "/lights", 0))
+		i = 1
+		@array = []
+		while !lights[i.to_s].nil?
+			@array[i] = lights[i.to_s]["name"]
+			i += 1
 		end
-		request("PUT", "/lights/#{light}/state", {"on" => true, "alert" => "#{alert_type}"}, time)
 	end
 	
+	def state(light, light_state, brightness, color, alert_type, transition_time, effects, time)
+		body = {}
+		
+		if light_state.to_i == 0
+			state = false
+		elsif light_state.to_i == 1
+			state = true
+		else
+			state = nil
+		end
+		
+		
+		if state != nil
+			body[:on] = state
+		end
+		
+		if brightness != 0
+			body[:bri] = brightness
+		end
+		
+		if effects != 0
+			body[:effect] = effects
+		end
+		
+		if transition_time != 0
+			body[:transitiontime] = transition_time
+		end
+		
+		if color != 0
+			#r = 0, g = 1, b = 2
+			#result = rgb_to_xy(color[0], color[1], color[2])
+			#body[:xy] = result
+			body[:hue] = color
+		end
+		
+		request("PUT", "/lights/#{light}/state", body, time)
+	end
+	
+	#converts rgb values to xy, which are used for color in the hub
+	#color picker I was using didn't work with twitter bootstrap
+	#so I had to take out functionality that used this
+	def rgb_to_xy(r, g, b)
+		x1 = (1.076450*r) - (0.237662*g) + (0.161212*b)
+		y1 = (0.410964*r) + (0.554342*g) + (0.034694*b)
+		z1 = (-0.010954*r) - (0.013389*g) + (1.024343*b)
+
+		x2 = x1 / (x1 + y1 + z1)
+		y2 = y1 / (x1 + y1 + z1)
+		
+		return x2, y2
+	end
+		
 	def schedule_status(number)
-		puts request("GET", "/schedules/#{number}", 0)
+		request("GET", "/schedules/#{number}", 0)
 	end	
 	
-	def schedule_set()
-		#for a reoccurring schedule I would have to split up the time into the separate integers and then add to the the day integer and setup a schedule to set a schedule
-		print "Enter time: "
-		time = gets.chomp
-		selection(time)
-	end
-	
 	def schedule_delete(light)
-		a = 1
-		
+		request("DELETE", "/schedules#{light}", 0)
 	end
 	
 	def schedule(choice)
@@ -117,24 +127,29 @@ module Hue
 	
 	def request(type, path, body = {}, time)
 		if time != 0
-			RestClient.post "#{url}/schedules", { "command" => { "address" => "/api/benthemathwhiz#{path}", "method" => "#{type}", "body" => body}, "time" => "#{time}"}.to_json
+			result = RestClient.post "#{url}/schedules", { "command" => { "address" => "/api/benthemathwhiz#{path}", "method" => "#{type}", "body" => body}, "time" => "#{time}"}.to_json
 		else	
 			if type == "PUT"
-				RestClient.put "#{url}#{path}", body.to_json
+				result = RestClient.put "#{url}#{path}", body.to_json
 			elsif type == "POST"
-				RestClient.post "#{url}#{path}", body.to_json
+				result = RestClient.post "#{url}#{path}", body.to_json
 			elsif type == "GET"
-				RestClient.get "#{url}#{path}"
+				result = RestClient.get "#{url}#{path}"
+				return result
 			elsif type == "DELETE"
-				RestClient.delete "#{url}#{path}", body.to_json
+				result = RestClient.delete "#{url}#{path}", body.to_json
 			else
 				puts "Invalid type"
 				exit
 			end
 		end
-	end
+		result = JSON.parse(result)
+		if !result[0]["error"].nil?
+			return "An error has occurred"
+		end
+	end	
 	
-	def meethue
+#	def meethue
 #		meethue = "https://www.meethue.com/de-US/user/sendMessageToBridge?clipmessage="
 #		command = [{"bridgeId" => "#{id}","clipCommand" => {"url" => "/api/0/lights/1/state","method" => "PUT","body" => {"bri" => 253,"on" => true,"xy" => [0.62576,0.31895]}}}]
 #		RestClient.get 'https://www.meethue.com/en-US/user/sendMessageToBridge?clipmessage=[{"bridgeId":"001788fffe09742e","clipCommand":{"url":"/api/0/lights/1/state","method":"PUT","body":{"on":true}}}]'
@@ -143,7 +158,7 @@ module Hue
 #		RestClient.get URI.escape 'https://www.meethue.com/en-US/user/sendMessageToBridge?clipmessage=[{"bridgeId":"001788fffe09742e","clipCommand":{"url":"/api/0/lights/1/state","method":"PUT","body":{"on":true}}}]'
 #		body = [{"bridgeId" => "001788fffe09742e","clipCommand" => {"url" => "/api/0/lights/1/state","method" => "PUT","body" => {"on" => false}}}]
 #		RestClient.post "https://www.meethue.com/en-US/user/sendMessageToBridge%3Fclipmessage=", body.to_json	
-	end
+#	end
 	
 end
 end

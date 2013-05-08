@@ -1,0 +1,20 @@
+<h2>Login</h2>
+
+<%= form_tag '/login' do %>
+
+Username:
+<%= text_field_tag :name %>
+<br>
+Hub IP:
+<%= text_field_tag :address, nil, :maxlength => 15, :size => 20, :class => "ip-input" %>
+
+<br><br>
+<%= submit_tag "Sign In" %>
+<% end %>
+<% if params[:address] %>
+<%= @address %>
+<% end %>
+
+<br>
+<%= link_to "Party Lighting", party_path %>
+<%= link_to "Home", root_path %>
