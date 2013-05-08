@@ -47,6 +47,11 @@ module Hue
 			i += 1
 		end
 	end
+
+	def create_group(lights = [], group_number)
+		body[:lights] = lights
+		request("PUT", "/groups/#{}", body, 0)
+	end
 	
 	def state(light, light_state, brightness, color, alert_type, transition_time, effects, time)
 		body = {}
@@ -76,6 +81,10 @@ module Hue
 			body[:transitiontime] = transition_time
 		end
 		
+		if alert_type != 0
+			body[:alert] = alert_type
+		end
+
 		if color != 0
 			#r = 0, g = 1, b = 2
 			#result = rgb_to_xy(color[0], color[1], color[2])

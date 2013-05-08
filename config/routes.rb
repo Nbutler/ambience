@@ -3,7 +3,7 @@ Ambience::Application.routes.draw do
 	match '/party', to: "home#party"
 	match '/login', to: "home#login"
 	match '/schedule', to: "home#schedule"
-	
+	match '/group', to: "home#group"
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

@@ -21,12 +21,15 @@ Color:
 	]), :class => 'btn dropdown-toggle' %>
 Brightness:
 <%= select_tag :brightness, options_for_select([["Dim", 50], ["Normal", 125], ["Bright", 200], ["Max", 255]]), :class => 'btn dropdown-toggle' %>
+<br><br>
+Alert:
+<%= select_tag :alert, options_for_select([["No alert", 0], ["Short alert", "select"], ["Long alert", "lselect"]]), :class => 'btn dropdown-toggle' %>
 </div>
 <br><br>
 <%= submit_tag "Save", :class => 'btn btn-primary' %>
 <% end %>
 <br>
 <% if params[:light].nil? && params[:date] %>
-<% @a.state(@a.array.index(params[:bulb]), params[:state], params[:brightness].to_i, params[:color].to_i, 0, 0, 0, @time) %>
+<% @a.state(@a.array.index(params[:bulb]), params[:state], params[:brightness].to_i, params[:color].to_i, params[:alert], 0, 0, @time) %>
 <br>
 <% end %>

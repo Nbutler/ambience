@@ -17,6 +17,7 @@ Color:
 <%= select_tag :color, options_for_select([
 	["White", 33333], ["Blue", 46920], ["Green", 25500], ["Red", 65535], ["Yellow", 15331], ["Purple", 52252], ["Orange", 5963]
 	]), :class => 'btn dropdown-toggle' %>
+
 </div>
 <br>
 <%= submit_tag "Save", :class => 'btn btn-primary' %>
@@ -25,7 +26,7 @@ Color:
 <br>
 <% if params[:light].nil? %>
 <% @a.state(@a.array.index(params[:bulb]), params[:state], params[:brightness].to_i,
-	params[:color].to_i, 0, 0, 0, 0) %>
+	params[:color].to_i, 0, 100, 0, 0) %>
 <br>
 <% end %>
 <br>

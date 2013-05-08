@@ -1,0 +1,16 @@
+
+
+
+
+<%= form_tag '/group' do %>
+
+Select lights to include in group:
+<br>
+<%= select_tag :bulb, options_for_select(@a.array[1, @a.array.length]), :multiple => true, :class => 'btn dropdown-toggle' %>
+
+<br><br>
+<%= submit_tag "Save", :class => 'btn btn-primary'%>
+<% end %>
+<% if params[:bulb] %>
+	<% create_group(params[:bulb], 1) %>
+<% end %>

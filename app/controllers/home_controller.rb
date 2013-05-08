@@ -40,4 +40,10 @@ class HomeController < ApplicationController
 		initial
 		
 	end
+
+	def group
+		initial
+
+	end
+
 end
